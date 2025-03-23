@@ -1,17 +1,20 @@
 const express = require('express')
 const app = express()
 const cors  = require('cors')
-const userController = require('./controllers/usersController')
+const audioToVideoController = require('./controllers/audioToVideoController')
+const aiController = require('./controllers/aiController')
 
-app.use(cors())
 app.use(express.json())
+app.use(cors())
 
 
 app.get('/', (req,res)=>{
     res.send('Welcome to your View Your Lyrics App!')
 })
 
-app.use('/users', userController)
+app.use('/ai', aiController)
+// app.use('/videoconverter', audioToVideoController)
+
 
 app.get("*", (req,res)=>{
     res.status(404).json({error: "Path not found"})
