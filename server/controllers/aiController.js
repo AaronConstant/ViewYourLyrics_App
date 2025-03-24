@@ -57,11 +57,20 @@ geminiPrompt.post('/', async (req, res) => {
         });
 
         const song = response.response.text(); 
+
+        let jsonResponse = song.trim();
+
+        if (jsonResponse.startsWith('```json')) {
+            jsonResponse = jsonResponse.slice(7); 
+        }
+        if (jsonResponse.endsWith('```')) {
+            jsonResponse = jsonResponse.slice(0, -3); 
+        }
         console.log("Generated song:", song);
         let parsedSong;
 
         try {
-            parsedSong = JSON.parse(song); 
+            parsedSong = JSON.parse(jsonResponse); 
             console.log("PARSED SONG:", parsedSong);
         } catch (error) {
             return res.status(500).json({ error: "Failed to parse song response as JSON." });

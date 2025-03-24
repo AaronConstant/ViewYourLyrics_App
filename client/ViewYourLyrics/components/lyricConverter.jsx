@@ -1,7 +1,10 @@
 import React from 'react'
 
-export default function lyricConverter() {
+export default function lyricConverter({ lyrics }) {
   return (
-    <div>lyricConverter</div>
+    <div>
+      <h2>Generated Song</h2>
+      <pre>{JSON.stringify(lyrics, null, 2)}</pre>
+    </div>
   )
 }
