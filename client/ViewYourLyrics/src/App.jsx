@@ -8,7 +8,7 @@ function App() {
   const [lyrics, setLyrics] = useState('')
   const [mood, setMood] = useState('')
   const [generatedLyrics, setGeneratedLyrics] = useState(null)
-  const API = import.meta.env.VITE_BASE_URL
+  const API = import.meta.env.VITE_BASE_URL || "http://localhost:4000"
   const [showHomepage, setShowHomepage] = useState(false)
   const nodeRef = useRef(null)
 

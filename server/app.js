@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const cors  = require('cors')
-const audioToVideoController = require('./controllers/audioToVideoController')
+const textToVideoController = require('./controllers/textToVideoController')
 const aiController = require('./controllers/aiController')
 
 app.use(express.json())
@@ -13,7 +13,7 @@ app.get('/', (req,res)=>{
 })
 
 app.use('/ai', aiController)
-// app.use('/videoconverter', audioToVideoController)
+app.use('/videoconverter', textToVideoController)
 
 
 app.get("*", (req,res)=>{
