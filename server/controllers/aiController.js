@@ -10,13 +10,16 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 
 const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
-    systemInstruction: "You are a lyricist and must create a song based on the provided prompt and mood. Structure the song with an intro, chorus, verses, and a bridge."
+    systemInstruction: "You are a lyricist and must create a song based on the provided prompt and mood. Structure the song with an intro, chorus, verses, and a bridge. Be Creative and pull inspiration from other artists."
 });
 
-const temperatures = [0.5, 1, 1.5, 2];
-
+function getTemperature(){
+    const temperatures = [0.5, 1, 1.5, 2];
+    
+ return temperatures[Math.floor(Math.random() * temperatures.length)]
+}
 const generationConfig = {
-    temperature: temperatures[Math.random(Math.floor() * temperatures.length)],
+    temperature: getTemperature(),
     topP: 0.95,
     topK: 40,
     maxOutputTokens: 8192,
@@ -72,6 +75,8 @@ geminiPrompt.post('/', async (req, res) => {
         try {
             parsedSong = JSON.parse(jsonResponse); 
             console.log("PARSED SONG:", parsedSong);
+            console.log(generationConfig)
+
         } catch (error) {
             return res.status(500).json({ error: "Failed to parse song response as JSON." });
         }
