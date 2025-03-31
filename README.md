@@ -27,9 +27,9 @@ This project is designed to help users create personalized song lyrics and conve
 
 ## Project Expectations
 
-1. **Generate Lyrics**: Users can input a mood and a brief description to generate creative song lyrics.
+1. **Generate Lyrics**: Users can input a mood and a brief description to generate lyrics for template of song.
 2. **Convert Lyrics to Video**: The generated lyrics are transformed into a video with animated text.
-3. **User-Friendly Interface**: A clean and intuitive UI for seamless interaction.
+3. **User-Friendly Interface**: A clean and intuitive UI interaction.
 
 ---
 
