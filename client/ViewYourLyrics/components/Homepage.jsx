@@ -1,13 +1,15 @@
 import React from "react";
 import LyricConverter from "./LyricConverter.jsx";
-export default function Homepage({
-  mood,
-  setMood,
-  lyrics,
-  setLyrics,
-  generateLyrics,
-  generatedLyrics,
-}) {
+// import { Route } from "react-router-dom";
+export default function Homepage() {
+  // {
+  //   mood,
+  //   setMood,
+  //   lyrics,
+  //   setLyrics,
+  //   generateLyrics,
+  //   generatedLyrics,
+  // }
   return (
     <div className="App-box">
       <form

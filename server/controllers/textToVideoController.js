@@ -18,21 +18,21 @@ textToVideoController.use(express.urlencoded({ extended: true }));
 
 textToVideoController.post('/', (req, res) => {
   let lyrics;
-  
+
   try {
     lyrics = JSON.parse(req.body.lyrics);
   } catch (error) {
     return res.status(400).json({ error: 'Invalid lyrics format' });
   }
 
-  if (!lyrics) {
-    return res.status(400).json({ error: 'Lyrics are required' });
+  if (!lyrics || !lyrics.name || !lyrics.intro || !lyrics.chorus || !lyrics.verses || !lyrics.bridge) {
+    return res.status(400).json({ error: 'Lyrics object is missing required properties' });
   }
 
   try {
     const timestamp = Date.now();
     const outputPath = path.join(videosDir, `output-${timestamp}.mp4`);
-    
+
     const lyricsLines = [
       `${lyrics.name.toUpperCase()}`,
       "",
@@ -52,35 +52,29 @@ textToVideoController.post('/', (req, res) => {
       ...lyrics.chorus.split('\n'),
       ""
     ];
-    
+
     if (lyrics.verses[2]) {
       lyricsLines.push("VERSE 3:");
       lyricsLines.push(...lyrics.verses[2].split('\n'));
       lyricsLines.push("");
     }
-    
+
     lyricsLines.push("BRIDGE:");
     lyricsLines.push(...lyrics.bridge.split('\n'));
     lyricsLines.push("");
     lyricsLines.push("CHORUS:");
     lyricsLines.push(...lyrics.chorus.split('\n'));
-    
+
     const duration = Math.max(30, Math.min(180, Math.ceil(lyricsLines.length * 1.5)));
-    
-    const scriptPath = path.join(videosDir, `script-${timestamp}.txt`);
-    
-    const textCommands = lyricsLines.map((line, index) => {
-      const safeText = line.replace(/'/g, "'\\''").replace(/"/g, '\\"');
-     
-      const yPos = 120 + index * 40;
-      
-      return `drawtext=text='${safeText}':fontcolor=white:fontsize=24:fontfile=/System/Library/Fonts/Helvetica.ttc:x=(w-text_w)/2:y=${yPos}-t*20:shadowcolor=black:shadowx=2:shadowy=2`;
-    }).join(',');
-    
+
     ffmpeg()
       .input(`color=c=black:s=1280x720:d=${duration}`)
       .inputFormat('lavfi')
-      .complexFilter(textCommands)
+      .complexFilter(lyricsLines.map((line, index) => {
+        const safeText = line.replace(/'/g, "'\\''").replace(/"/g, '\\"');
+        const yPos = 120 + index * 40;
+        return `drawtext=text='${safeText}':fontcolor=white:fontsize=24:fontfile=/System/Library/Fonts/Helvetica.ttc:x=(w-text_w)/2:y=${yPos}-t*20:shadowcolor=black:shadowx=2:shadowy=2`;
+      }).join(','))
       .outputOptions(['-c:v libx264', '-pix_fmt yuv420p'])
       .output(outputPath)
       .on('start', (commandLine) => {
@@ -89,7 +83,7 @@ textToVideoController.post('/', (req, res) => {
       .on('end', () => {
         res.json({ 
           success: true,
-          videoUrl: `/videoconverter/videos/${path.basename(outputPath)}`,
+          videoUrl: `/videos/${path.basename(outputPath)}`,
           message: 'Video created successfully'
         });
       })

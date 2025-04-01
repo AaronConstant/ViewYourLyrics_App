@@ -21,20 +21,26 @@ export default function LyricConverter({ lyrics }) {
   const handleVideoConversion = async () => {
     setIsLoading(true);
     setError('');
-    
+  
     try {
       const response = await axios.post(`${API}/videoconverter`, { 
-        lyrics: JSON.stringify(lyrics) 
+        lyrics: JSON.stringify({
+          name: generatedLyrics.name,
+          intro: generatedLyrics.intro,
+          chorus: generatedLyrics.chorus,
+          verses: generatedLyrics.verses,
+          bridge: generatedLyrics.bridge
+        })
       });
-      
+  
       console.log("Video conversion response:", response);
-      
+  
       if (response.data.videoUrl) {
         const fullVideoUrl = `${API}${response.data.videoUrl}`;
         setVideoUrl(fullVideoUrl);
         console.log("Video URL:", fullVideoUrl);
       } else {
-        setError('No video URL returned from server:', response.error);
+        setError('No video URL returned from server.');
       }
     } catch (error) {
       console.error("Error converting lyrics to video", error);
