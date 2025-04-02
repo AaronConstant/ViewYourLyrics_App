@@ -1,18 +1,45 @@
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../src/Styling/LandingPage.scss';
 
 function LandingPage() {
-  const navigate = useNavigate()
+  const [isFadingOut, setIsFadingOut] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const navigate = useNavigate();
+
 
   const handleStartClick = () => {
-    navigate('/home')
-  }
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmYes = () => {
+    setIsFadingOut(true);
+    setTimeout(() => {
+      navigate('/home'); 
+    }, 2000); 
+  };
 
   return (
-    <div className='LandingPage'>
-      <h1>Want to create Passionate Song?</h1>
-      <button onClick={handleStartClick}>Yes!</button>
+    <div className={`LandingPage ${isFadingOut ? 'fade-out' : ''}`}>
+      <h1>Oh Hello There!</h1>
+      <h2>Welcome to our Platform</h2>
+      <h1 className="brand">Kanioki</h1>
+      <h3>Are you ready to start?</h3>
+      <div className="button-container">
+        <button onClick={handleStartClick}>Yes</button>
+        <button onClick={handleStartClick}>No</button>
+      </div>
+
+      {showConfirmation && (
+        <div className="confirmation-dialog fade-in">
+          <h3>I Think you meant to click...?</h3>
+          <div className="button-container">
+            <button onClick={handleConfirmYes}>Yes</button>
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
-export default LandingPage
+export default LandingPage;

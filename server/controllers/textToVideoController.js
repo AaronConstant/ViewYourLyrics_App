@@ -21,6 +21,7 @@ textToVideoController.post('/', (req, res) => {
 
   try {
     lyrics = JSON.parse(req.body.lyrics);
+    console.log(lyrics)
   } catch (error) {
     return res.status(400).json({ error: 'Invalid lyrics format' });
   }

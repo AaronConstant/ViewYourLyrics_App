@@ -50,6 +50,7 @@ export default function LyricConverter({ lyrics }) {
     }
   };
 
+
   return (
     <div className="lyrics-container">
       <h2>Generated Song: {name}</h2>

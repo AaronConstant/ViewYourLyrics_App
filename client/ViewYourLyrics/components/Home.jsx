@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import VideoConverter from './VideoConverter';
-
+import '../src/Styling/Home.scss';
 const API = import.meta.env.VITE_BASE_URL || "http://localhost:4000";
 
 function Home() {
@@ -9,10 +9,19 @@ function Home() {
   const [mood, setMood] = useState('');
   const [generatedLyrics, setGeneratedLyrics] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
+  const [isLyricsLoading, setIsLyricsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const generateLyrics = async () => {
+    if (!lyrics.trim() || !mood.trim()) {
+      setError('Please enter both a mood and description');
+      return;
+    }
+
+    setIsLyricsLoading(true);
+    setError('');
+    
     try {
       const response = await axios.post(
         `${API}/ai`,
@@ -24,6 +33,9 @@ function Home() {
       setGeneratedLyrics(response.data);
     } catch (error) {
       console.error("Error generating lyrics:", error);
+      setError(error.response?.data?.error || 'Failed to generate lyrics');
+    } finally {
+      setIsLyricsLoading(false);
     }
   };
 
@@ -33,22 +45,22 @@ function Home() {
       return;
     }
 
-    setIsLoading(true);
+    setIsVideoLoading(true);
     setError('');
-  
+
     try {
       const response = await axios.post(`${API}/videoconverter`, { 
         lyrics: JSON.stringify({
-          name: generatedLyrics.name,
-          intro: generatedLyrics.intro,
-          chorus: generatedLyrics.chorus,
-          verses: generatedLyrics.verses,
-          bridge: generatedLyrics.bridge
+          name: formatLyrics(generatedLyrics.name),
+          intro: formatLyrics(generatedLyrics.intro),
+          chorus: formatLyrics(generatedLyrics.chorus),
+          verses: generatedLyrics.verses.map(formatLyrics),
+          bridge: formatLyrics(generatedLyrics.bridge)
         })
       });
-  
+
       console.log("Video conversion response:", response);
-  
+
       if (response.data.videoUrl) {
         const fullVideoUrl = `${API}${response.data.videoUrl}`;
         setVideoUrl(fullVideoUrl);
@@ -60,61 +72,110 @@ function Home() {
       console.error("Error converting lyrics to video", error);
       setError(error.response?.data?.error || 'Failed to convert lyrics to video');
     } finally {
-      setIsLoading(false);
+      setIsVideoLoading(false);
     }
   };
+
+  const formatLyrics = (text) => {
+    if (!text) return '';
+
+    const formattedText = text.replace(/,/g, ',\n');
+    return formattedText;
+  };
+
 
   return (
     <div className='Homepage'>
       <h2>Let's get you started!</h2>
-      <textarea
-        placeholder="Enter your lyrics here..."
-        value={lyrics}
-        onChange={(e) => setLyrics(e.target.value)}
-      />
       <input
         type="text"
         placeholder="Enter the mood..."
         value={mood}
         onChange={(e) => setMood(e.target.value)}
+        disabled={isLyricsLoading}
       />
-      <button onClick={generateLyrics}>Generate Lyrics</button>
+      <textarea
+        placeholder="Give us a brief description..."
+        value={lyrics}
+        onChange={(e) => setLyrics(e.target.value)}
+        disabled={isLyricsLoading}
+      />
+      <button 
+        onClick={generateLyrics} 
+        disabled={isLyricsLoading}
+        className={isLyricsLoading ? 'loading-button' : ''}
+      >
+        {isLyricsLoading ? (
+          <div className="loading-container">
+            <div className="loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <span>Creating lyrics</span>
+          </div>
+        ) : 'Generate Lyrics'}
+      </button>
 
-      {generatedLyrics && (
+      {error && <div className="error-message">{error}</div>}
+
+      {isLyricsLoading && (
+        <div className="lyrics-loading-animation">
+          <div className="music-notes">
+            <span>♪</span>
+            <span>♫</span>
+            <span>♪</span>
+            <span>♫</span>
+          </div>
+          <p>Crafting your lyrics...</p>
+        </div>
+      )}
+
+      {generatedLyrics && !isLyricsLoading && (
         <div className="GeneratedLyrics">
           <h2>{generatedLyrics.name}</h2>
           <p><em>{mood.toUpperCase()} MOOD</em></p>
           <br />
           <p><strong>INTRO:</strong></p>
-          <p>{generatedLyrics.intro}</p>
+          <p>{formatLyrics(generatedLyrics.intro)}</p>
           <br />
           {generatedLyrics.verses.map((verse, index) => (
             <div key={index}>
               <p><strong>VERSE {index + 1}:</strong></p>
-              <p>{verse}</p>
+              <p>{formatLyrics(verse)}</p>
               <br />
             </div>
           ))}
           <p><strong>CHORUS:</strong></p>
-          <p>{generatedLyrics.chorus}</p>
+          <p>{formatLyrics(generatedLyrics.chorus)}</p>
           <br />
           <p><strong>BRIDGE:</strong></p>
-          <p>{generatedLyrics.bridge}</p>
+          {  console.log(formatLyrics(generatedLyrics.bridge))}
+          
+          <p>{formatLyrics(generatedLyrics.bridge)}</p>
           <br />
           <p><strong>CHORUS:</strong></p>
-          <p>{generatedLyrics.chorus}</p>
+          <p>{formatLyrics(generatedLyrics.chorus)}</p>
         </div>
       )}
 
       <button
         onClick={handleVideoConversion}
-        disabled={isLoading}
-        className="convert-button"
+        disabled={isVideoLoading || !generatedLyrics}
+        className={`convert-button ${isVideoLoading ? 'loading-button' : ''}`}
       >
-        {isLoading ? 'Creating Video...' : 'Convert to Video'}
+        {isVideoLoading ? (
+          <div className="loading-container">
+            <div className="loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <span>Creating Video</span>
+          </div>
+        ) : 'Convert to Video'}
       </button>
 
-      {error && <div className="error-message">{error}</div>}
       {videoUrl && <VideoConverter videoUrl={videoUrl} />}
     </div>
   );

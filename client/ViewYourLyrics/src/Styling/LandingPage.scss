@@ -1,0 +1,145 @@
+.LandingPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    background-color: #000000dd;
+    padding: 2em;
+    margin: 15em auto;
+    border-radius: 20px;
+    box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.2), 
+    0 6px 20px rgba(0, 0, 0, 0.39);
+    
+    opacity: 0;
+    animation: fadeIn 2s ease-in-out forwards;
+
+    &.fade-out {
+        animation: fadeOut 2s ease-in-out forwards;
+    }
+
+    h1 {
+        font-size: 2.5em;
+        color: #ffffff;
+        margin-bottom: 0.5em;
+        text-align: center;
+        opacity: 0;
+        animation: fadeIn 2s ease-in-out forwards;
+        animation-delay: 1.5s;
+        letter-spacing: 5px;
+    }
+    .brand {
+        font-size: 2.5em;
+        color: #6355f9;
+        margin-bottom: 0.5em;
+        text-align: center;
+        opacity: 0;
+        animation: fadeIn 2s ease-in-out forwards;
+        animation-delay: 3.5s;
+        letter-spacing: 5px;
+
+    }
+
+    h2 {
+        font-size: 1.5em;
+        color: #fee28d;
+        margin-bottom: 1em;
+        text-align: center;
+        opacity: 0;
+        animation: fadeIn 2s ease-in-out forwards;
+        animation-delay: 2.5s;
+        letter-spacing: 5px;
+    }
+
+    h3 {
+        font-size: 1.2em;
+        color: #ffffff;
+        margin-bottom: 1em;
+        text-align: center;
+        opacity: 0;
+        animation: fadeIn 2s ease-in-out forwards;
+        animation-delay: 5.5s;
+        letter-spacing: 5px;
+    }
+
+    button {
+        padding: 0.8em 2em;
+        font-size: 1.2em;
+        color: #000000;
+        background-color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+            background-color: #f7ff5a;
+        }
+    }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 1em;
+        opacity: 0;
+        animation: fadeIn 2s ease-in-out forwards;
+        animation-delay: 5.5s;
+
+        button {
+            margin: 0 1em;
+        }
+    }
+    .confirmation-dialog {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #000000;
+        padding: 2em;
+        border-radius: 10px;
+        border: 2px solid #440b0b;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.39);
+        text-align: center;
+        opacity: 0;
+        animation: fadeIn 1s ease-in-out forwards;
+      
+        .button-container {
+          display: flex;
+          justify-content: center;
+      
+          button {
+            margin: 0 1em;
+            padding: 0.8em 2em;
+            font-size: 1.2em;
+            color: #000000;
+            background-color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+      
+            &:hover {
+              background-color: #e9f15b;
+            }
+          }
+        }
+      }
+
+}
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
