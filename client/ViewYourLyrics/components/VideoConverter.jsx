@@ -9,17 +9,20 @@ export default function VideoConverter({ videoUrl }) {
     a.click();
     document.body.removeChild(a);
   };
-  
+
+  console.log("Full Video URL from Home Component: ", videoUrl);
+  console.log()
 
   return (
     <div className="video-container">
       <h3>Your Lyrics Video</h3>
-      <video width="100%" controls>
+      <video width="120%" controls>
         <source src={videoUrl} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       
       <div className="video-controls">
+        {console.log("Video URL: ", videoUrl)}
         <button onClick={handleDownload} className="download-button">
           Download Video
         </button>

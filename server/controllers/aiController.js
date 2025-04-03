@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('cors');
 require('dotenv').config();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -74,8 +73,6 @@ geminiPrompt.post('/', async (req, res) => {
 
         try {
             parsedSong = JSON.parse(jsonResponse); 
-            console.log("PARSED SONG:", parsedSong);
-            console.log(generationConfig)
 
         } catch (error) {
             return res.status(500).json({ error: "Failed to parse song response as JSON." });

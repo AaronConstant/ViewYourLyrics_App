@@ -31,6 +31,7 @@ function Home() {
         }
       );
       setGeneratedLyrics(response.data);
+      console.log("Generated lyrics:", response.data);
     } catch (error) {
       console.error("Error generating lyrics:", error);
       setError(error.response?.data?.error || 'Failed to generate lyrics');
@@ -44,27 +45,23 @@ function Home() {
       setError('Please generate lyrics before converting to video.');
       return;
     }
-
     setIsVideoLoading(true);
     setError('');
 
     try {
       const response = await axios.post(`${API}/videoconverter`, { 
-        lyrics: JSON.stringify({
-          name: formatLyrics(generatedLyrics.name),
-          intro: formatLyrics(generatedLyrics.intro),
-          chorus: formatLyrics(generatedLyrics.chorus),
-          verses: generatedLyrics.verses.map(formatLyrics),
-          bridge: formatLyrics(generatedLyrics.bridge)
-        })
+        lyrics: JSON.stringify(generatedLyrics)
+        
       });
+      
 
       console.log("Video conversion response:", response);
 
       if (response.data.videoUrl) {
         const fullVideoUrl = `${API}${response.data.videoUrl}`;
+        console.log("We have A URL: ",fullVideoUrl)
         setVideoUrl(fullVideoUrl);
-        console.log("Video URL:", fullVideoUrl);
+        console.log("Video URL: ", fullVideoUrl);
       } else {
         setError('No video URL returned from server.');
       }
@@ -78,12 +75,14 @@ function Home() {
 
   const formatLyrics = (text) => {
     if (!text) return '';
-
-    const formattedText = text.replace(/,/g, ',\n');
-    return formattedText;
+  
+    return text.split(',').map((line, index) => (
+      <span key={index}>
+        {line},{<br />}
+      </span>
+    ));
   };
-
-
+  
   return (
     <div className='Homepage'>
       <h2>Let's get you started!</h2>
@@ -130,7 +129,6 @@ function Home() {
           <p>Crafting your lyrics...</p>
         </div>
       )}
-
       {generatedLyrics && !isLyricsLoading && (
         <div className="GeneratedLyrics">
           <h2>{generatedLyrics.name}</h2>
@@ -150,8 +148,6 @@ function Home() {
           <p>{formatLyrics(generatedLyrics.chorus)}</p>
           <br />
           <p><strong>BRIDGE:</strong></p>
-          {  console.log(formatLyrics(generatedLyrics.bridge))}
-          
           <p>{formatLyrics(generatedLyrics.bridge)}</p>
           <br />
           <p><strong>CHORUS:</strong></p>
@@ -175,8 +171,10 @@ function Home() {
           </div>
         ) : 'Convert to Video'}
       </button>
+      {error && <div className="error-message">{error}</div>}
 
-      {videoUrl && <VideoConverter videoUrl={videoUrl} />}
+      {videoUrl && <VideoConverter videoUrl={videoUrl}/>}
+      {console.log("Video URL: ", videoUrl)}
     </div>
   );
 }

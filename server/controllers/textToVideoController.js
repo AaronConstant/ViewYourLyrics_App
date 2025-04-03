@@ -9,6 +9,7 @@ require('dotenv').config();
 ffmpeg.setFfmpegPath(ffmpegStatic);
 
 const videosDir = path.join(__dirname, 'videos');
+console.log("Videos directory:", videosDir);
 if (!fs.existsSync(videosDir)) {
   fs.mkdirSync(videosDir, { recursive: true });
 }
@@ -20,8 +21,15 @@ textToVideoController.post('/', (req, res) => {
   let lyrics;
 
   try {
-    lyrics = JSON.parse(req.body.lyrics);
-    console.log(lyrics)
+    if(typeof req.body.lyrics === 'string') {
+      lyrics = JSON.parse(req.body.lyrics);
+      console.log("Parsed lyrics:", lyrics);
+    } else {
+      lyrics = req.body.lyrics;
+    }
+    if(lyrics.generatedLyrics) {
+      lyrics = lyrics.generatedLyrics
+    }
   } catch (error) {
     return res.status(400).json({ error: 'Invalid lyrics format' });
   }
@@ -32,7 +40,10 @@ textToVideoController.post('/', (req, res) => {
 
   try {
     const timestamp = Date.now();
-    const outputPath = path.join(videosDir, `output-${timestamp}.mp4`);
+    const outputPath = `${videosDir}/output-${timestamp}.mp4`;
+    console.log("Output path:", outputPath);
+    const videoPath = path.join(__dirname, 'videos', `output-${timestamp}.mp4`);
+    console.log("Video path:", videoPath);
 
     const lyricsLines = [
       `${lyrics.name.toUpperCase()}`,
@@ -53,6 +64,10 @@ textToVideoController.post('/', (req, res) => {
       ...lyrics.chorus.split('\n'),
       ""
     ];
+    const duration = Math.max(30, Math.min(180, Math.ceil(lyricsLines.length * 1.5)));
+    console.log("Video duration:", duration); 
+
+
 
     if (lyrics.verses[2]) {
       lyricsLines.push("VERSE 3:");
@@ -65,28 +80,29 @@ textToVideoController.post('/', (req, res) => {
     lyricsLines.push("");
     lyricsLines.push("CHORUS:");
     lyricsLines.push(...lyrics.chorus.split('\n'));
-
-    const duration = Math.max(30, Math.min(180, Math.ceil(lyricsLines.length * 1.5)));
-
+    console.log("FFmpeg Outpath:", outputPath);
     ffmpeg()
       .input(`color=c=black:s=1280x720:d=${duration}`)
       .inputFormat('lavfi')
       .complexFilter(lyricsLines.map((line, index) => {
-        const safeText = line.replace(/'/g, "'\\''").replace(/"/g, '\\"');
-        const yPos = 120 + index * 40;
-        return `drawtext=text='${safeText}':fontcolor=white:fontsize=24:fontfile=/System/Library/Fonts/Helvetica.ttc:x=(w-text_w)/2:y=${yPos}-t*20:shadowcolor=black:shadowx=2:shadowy=2`;
+        const safeText = line.replace(/:/g, '\\:').replace(/'/g, "’").replace(/"/g, '\"');
+        const yPos = 120 + index * 50;
+        return `drawtext=text='${safeText}':fontcolor=white:fontsize=24:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:x=(w-text_w)/2:y=${yPos}:shadowcolor=black:shadowx=2:shadowy=2`;
       }).join(','))
       .outputOptions(['-c:v libx264', '-pix_fmt yuv420p'])
       .output(outputPath)
       .on('start', (commandLine) => {
-        console.log('FFmpeg command initiated');
-      })
+              })
       .on('end', () => {
+        if(fs.existsSync(videoPath)) {
+          console.log("Video file exists:", videoPath);
         res.json({ 
           success: true,
           videoUrl: `/videos/${path.basename(outputPath)}`,
           message: 'Video created successfully'
         });
+      }
+        console.log(`${path.basename(outputPath)} created successfully`);;
       })
       .on('error', (error) => {
         console.error("Error processing video:", error);
@@ -94,11 +110,12 @@ textToVideoController.post('/', (req, res) => {
       })
       .run();
   } catch (error) {
-    console.error("General server error:", error);
+    console.error("General server error: ", error);
     res.status(500).json({ error: "An unexpected error occurred." });
   }
 });
 
 textToVideoController.use('/videos', express.static(videosDir));
+console.log("Serving static files from:", videosDir);
 
 module.exports = textToVideoController;

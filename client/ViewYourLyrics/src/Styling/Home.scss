@@ -102,7 +102,7 @@
     width: 100%;
     opacity: 0;
     animation: fadeIn 2s ease-in-out forwards;
-    animation-delay: 2.5s;
+    animation-delay: 1.5s;
 
     h2 {
       font-size: 2em;
@@ -158,14 +158,13 @@
   }
 }
 
-/* Fade-in animation */
 @keyframes fadeIn {
   0% {
     opacity: 0;
-    transform: translateY(20px); /* Slight upward motion */
+    transform: translateY(20px); 
   }
   100% {
     opacity: 1;
-    transform: translateY(0); /* Reset position */
+    transform: translateY(0);
   }
 }
